@@ -57,18 +57,13 @@ int main(int argc, char *argv[]) {
     cout << "Limiar de Custo: " << limiarCusto << endl;
     cout << "Coeficientes: a=" << a << " b=" << b << " c=" << c << endl;
     cout << "Tamanho do vetor: " << tam << endl;
-    cout << "Primeiros 5 números: ";
-    for (int i = 0; i < 5 && i < count; i++) {
-        cout << vetor[i] << " ";
-    }
     cout << endl;
     DadosAlg d = DadosAlg();
-    insertionSort(vetor, 0, count - 1, &d);
+    //insertionSort(vetor, 0, count - 1, &d);
+    quickSort3(vetor, 0, count - 1, &d);
     d.print();
-    cout << "Vetor ordenado: ";     
-    for (int i = 0; i < count; i++) {
-        cout << vetor[i] << " ";
-    }
+    d.custo(a, b, c);
+    cout << "Custo: " << d.custo(a, b, c) << endl;
 
     // Libera a memória alocada
     delete[] vetor;

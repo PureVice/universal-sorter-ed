@@ -8,6 +8,7 @@ public:
     int cmp;
     int mov;
     int calls;
+    double custo(double a, double b, double c);
     
     DadosAlg();
     void inccmp(int n);
@@ -21,8 +22,8 @@ public:
 // Declaração das funções de ordenação
 void insertionSort(int v[], int l, int r, DadosAlg *d);
 int median(int a, int b, int c);
-void partition3(int* A, int l, int r, int* i, int* j, DadosAlg d);
-void quickSort3(int* A, int l, int r, DadosAlg d);
+void partition3(int* A, int l, int r, int* i, int* j, DadosAlg *d);
+void quickSort3(int* A, int l, int r, DadosAlg *d);
 
 // Classe principal do Ordenador Universal
 class OrdenadorUniversal {
