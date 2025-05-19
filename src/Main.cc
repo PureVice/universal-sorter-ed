@@ -2,76 +2,69 @@
 #include <cstdlib>
 #include <fstream>
 #include "../include/OrdenadorUniversal.h"
+
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    // Verifica se o arquivo foi passado como argumento
     if (argc != 2) {
         cerr << "Uso: " << argv[0] << " <arquivo.txt>" << endl;
         return 1;
     }
 
-    // Abre o arquivo
     ifstream arquivo(argv[1]);
     if (!arquivo.is_open()) {
         cerr << "Erro ao abrir o arquivo!" << endl;
         return 1;
     }
 
-    // Variáveis para os parâmetros iniciais
+    // Parâmetros de entrada
     int seed;
     double limiarCusto, a, b, c;
     int tam;
 
-    // Lendo os 6 primeiros parâmetros
     arquivo >> seed >> limiarCusto >> a >> b >> c >> tam;
 
-    // Verifica se o tamanho declarado é válido
+    if (tam <= 0) {
+        cerr << "Tamanho do vetor inválido!" << endl;
+        return 1;
+    }
 
-    // Alocando memória para os números
+    // Alocar e ler vetor
     int* vetor = new int[tam];
     int count = 0;
-    
-    // Lendo os números restantes
     while (count < tam && arquivo >> vetor[count]) {
         count++;
     }
-
-    // Fecha o arquivo
     arquivo.close();
 
-    // Verifica se leu todos os números esperados
     if (count != tam) {
         cerr << "Aviso: Foram lidos " << count << " números, mas eram esperados " << tam << endl;
     }
 
-    /////////////////////////////////////////////////
-    // A partir daqui, implemente a lógica do TP:   //
-    // 1. Determinação dos limiares                //
-    // 2. Implementação dos algoritmos de ordenação//
-    // 3. Lógica do Ordenador Universal            //
-    /////////////////////////////////////////////////
+    // Definir os limiares com base nos testes de custo
+    int minTamParticao = determinaLimiarParticao(vetor, tam, limiarCusto, a, b, c);
+    int limiarQuebras = determinaLimiarQuebras(vetor, tam, limiarCusto, a, b, c);
 
-    // Exemplo de uso dos parâmetros (apenas para teste)
+    // Executar Ordenador Universal com os limiares encontrados
+    DadosAlg d;
+    OrdenadorUniversal ou;
+    ou.ordenadorUniversal(vetor, tam, minTamParticao, limiarQuebras, d);
+
+    // Saída dos dados
+    cout << ">>> Parâmetros lidos do arquivo:" << endl;
     cout << "Seed: " << seed << endl;
     cout << "Limiar de Custo: " << limiarCusto << endl;
-    cout << "Coeficientes: a=" << a << " b=" << b << " c=" << c << endl;
-    cout << "Tamanho do vetor: " << tam << endl;
-    cout << endl;
-    OrdenadorUniversal o = OrdenadorUniversal();
-    int quebras = o.calcularQuebras(vetor, count);
-    DadosAlg d = DadosAlg();
-    
-    //insertionSort(vetor, 0, count - 1, &d);
-    quickSort3(vetor, 0, count - 1, &d);
+    cout << "Coeficientes: a=" << a << ", b=" << b << ", c=" << c << endl;
+    cout << "Tamanho do vetor: " << tam << endl << endl;
+
+    cout << ">>> Resultados:" << endl;
+    cout << "Limiar ótimo de Partição: " << minTamParticao << endl;
+    cout << "Limiar ótimo de Quebras: " << limiarQuebras << endl;
+    cout << "Número de quebras no vetor original: " << ou.calcularQuebras(vetor, tam) << endl;
+
     d.print();
-    d.custo(a, b, c);
-    
-    cout << "Quebras: " << quebras << endl;
-    cout << "Custo: " << d.custo(a, b, c) << endl; //deveria ser o custo do TAD
+    cout << "Custo total: " << d.custo(a, b, c) << endl;
 
-    // Libera a memória alocada
     delete[] vetor;
-
     return 0;
 }

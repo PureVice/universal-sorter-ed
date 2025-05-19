@@ -24,6 +24,10 @@ void insertionSort(int v[], int l, int r, DadosAlg *d);
 int median(int a, int b, int c);
 void partition3(int* A, int l, int r, int* i, int* j, DadosAlg *d);
 void quickSort3(int* A, int l, int r, DadosAlg *d);
+int determinaLimiarParticao(int V[], int tam, double limiarCusto, double a, double b, double c);
+void calculaNovaFaixa(int limParticao, int numMPS, int particoes[], int &minMPS, int &maxMPS, int &passoMPS);
+int menorCusto(double custos[], int tamanho);
+
 
 // Classe principal do Ordenador Universal
 class OrdenadorUniversal {
