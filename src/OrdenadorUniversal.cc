@@ -1,149 +1,12 @@
 #include "../include/OrdenadorUniversal.h"
+#include "../include/Ordenacao.h"
+#include "../include/Util.h"
 #include <iostream>
 
-// Implementação dos métodos da classe DadosAlg
-DadosAlg::DadosAlg() : cmp(0), mov(0), calls(0) {}
 
-double DadosAlg::custo(double a, double b, double c)
-{
-    double custo = 0;
-    custo = a * cmp + b * mov + c * calls;
-    return custo;
-}
-void DadosAlg::inccmp(int n)
-{
-    cmp += n;
-}
 
-void DadosAlg::incmov(int n)
-{
-    mov += n;
-}
 
-void DadosAlg::inccalls(int n)
-{
-    calls += n;
-}
 
-void DadosAlg::swap(int *a, int *b)
-{
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-    incmov(3);
-}
-
-void DadosAlg::reset()
-{
-    cmp = 0;
-    mov = 0;
-    calls = 0;
-}
-
-void DadosAlg::print()
-{
-    std::cout << "Comparações: " << cmp << ", Movimentações: " << mov << ", Chamadas: " << calls << std::endl;
-}
-
-// Implementação das funções de ordenação
-void insertionSort(int v[], int l, int r, DadosAlg *d)
-{
-    d->inccalls(1);
-    int i, j, key;
-    for (i = l + 1; i <= r; i++)
-    {
-        d->inccmp(1);
-        key = v[i];
-        d->incmov(1);
-        j = i - 1;
-        while (j >= 0 && v[j] > key)
-        {
-            d->inccmp(1);
-            d->incmov(1);
-            v[j + 1] = v[j];
-            j--;
-        }
-        d->incmov(1);
-        v[j + 1] = key;
-    }
-}
-
-int median(int a, int b, int c)
-{
-    if ((a <= b) && (b <= c))
-        return b;
-    if ((a <= c) && (c <= b))
-        return c;
-    if ((b <= a) && (a <= c))
-        return a;
-    if ((b <= c) && (c <= a))
-        return c;
-    if ((c <= a) && (a <= b))
-        return a;
-    return b;
-}
-
-void partition3(int *A, int l, int r, int *i, int *j, DadosAlg *d)
-{
-    int x;
-    int m = (l + r) / 2;
-    *i = l;
-    *j = r;
-    x = median(A[l], A[m], A[r]);
-    d->inccalls(1);
-
-    do
-    {
-        while (A[*i] < x)
-        {
-            (*i)++;
-            d->inccmp(1);
-        }
-        d->inccmp(1);
-        while (A[*j] > x)
-        {
-            (*j)--;
-            d->inccmp(1);
-        }
-        d->inccmp(1);
-        if (*i <= *j)
-        {
-            d->swap(&A[*i], &A[*j]);
-            (*i)++;
-            (*j)--;
-        }
-    } while (*i <= *j);
-}
-
-void quickSort3(int *A, int l, int r, DadosAlg *d)
-{
-    d->inccalls(1);
-    if (l < r)
-    {
-        int i, j;
-        partition3(A, l, r, &i, &j, d);
-        if (l < j)
-            quickSort3(A, l, j, d);
-        if (i < r)
-            quickSort3(A, i, r, d);
-    }
-}
-
-int calcularQuebras(int V[], int tam)
-{
-    int quebras = 0;
-    for (int i = 1; i < tam; i++)
-    {
-        if (V[i] < V[i - 1])
-            quebras++;
-    }
-    return quebras;
-}
-
-double absDouble(double x)
-{
-    return (x < 0) ? -x : x;
-}
 
 // Retorna o índice do menor custo no vetor
 int menorCusto(double custos[], int tamanho)
@@ -163,144 +26,95 @@ int menorCusto(double custos[], int tamanho)
     return idxMin;
 }
 
-// Calcula nova faixa de busca em torno da melhor partição encontrada
-void calculaNovaFaixa(int limParticao, int numMPS, int particoes[], int &minMPS, int &maxMPS, int &passoMPS)
-{
-    int newMinIdx = 0;
-    int newMaxIdx = 0;
-
-    // Se o melhor valor está no início da lista
-    if (limParticao == 0)
-    {
-        newMinIdx = 0;
-        if (numMPS >= 3)
-        {
-            newMaxIdx = 2;
-        }
-        else
-        {
-            newMaxIdx = numMPS - 1;
-        }
-    }
-    // Se o melhor valor está no fim da lista
-    else if (limParticao == numMPS - 1)
-    {
-        if (numMPS >= 3)
-        {
-            newMinIdx = numMPS - 3;
-        }
-        else
-        {
-            newMinIdx = 0;
-        }
-        newMaxIdx = numMPS - 1;
-    }
-    // Se o melhor valor está no meio da lista
-    else
-    {
-        newMinIdx = limParticao - 1;
-        newMaxIdx = limParticao + 1;
-    }
-
-    minMPS = particoes[newMinIdx];
-    maxMPS = particoes[newMaxIdx];
-    passoMPS = (maxMPS - minMPS) / 5;
-
-    if (passoMPS == 0)
-    {
-        passoMPS = 1;
-    }
+int getMPS(int index, int minMPS, int passoMPS) {
+    return minMPS + index * passoMPS;
 }
 
 
+// Calcula nova faixa de busca em torno da melhor partição encontrada
+void calculaNovaFaixa(int limParticao, int numMPS, int& minMPS, int& maxMPS, int& passoMPS) {  
+    int newMin, newMax;
+    
+    if (limParticao == 0) {
+        newMin = 0;
+        newMax = 2;
+    } else if (limParticao == numMPS - 1) {
+        newMin = numMPS - 3;
+        newMax = numMPS - 1;
+    } else {
+        newMin = limParticao - 1;
+        newMax = limParticao + 1;
+    }
+    
+    // Converte índices para tamanhos reais de partição
+    minMPS = getMPS(newMin, minMPS, passoMPS);
+    maxMPS = getMPS(newMax, minMPS, passoMPS);
+    
+    // Garante que minMPS não seja menor que 2
+    if (minMPS < 2) minMPS = 2;
+    
+    passoMPS = (maxMPS - minMPS) / 5;
+    if (passoMPS == 0) passoMPS = 1;
+} 
+
+
+struct estatisticas{
+
+
+
+};
 
 // Função principal para determinar o melhor minTamParticao
-int determinaLimiarParticao(int V[], int tam, double limiarCusto, double a, double b, double c)
-{
+int determinaLimiarParticao(int* V, int tam, double limiarCusto, double a, double b, double c) {
+    std::cout << "entrou no determinaLimiar" << std::endl ;
     int minMPS = 2;
     int maxMPS = tam;
-    int limParticao = minMPS;
-
-    const int MAX_PARTICOES = 100;
-    int particoes[MAX_PARTICOES];
-    double custos[MAX_PARTICOES];
-
+    int numMPS = 5;
+    int passoMPS = (maxMPS - minMPS) / 5;
     int iter = 0;
+    #define MAX_CUSTOS 100
+    double custo[MAX_CUSTOS];
+    int limParticao = 0;
+    DadosAlg d;
+    OrdenadorUniversal U;
+    double diffCusto = limiarCusto + 1;  // Garante entrada no loop
+       
+    // Função local para encontrar índice do menor custo
 
-    while (true)
-    {
-        int passo = (maxMPS - minMPS) / 5;
-        if (passo == 0)
-            passo = 1;
 
-        int numMPS = 0;
-        DadosAlg * listadados;
-        printf("iter %d\n", iter);
-
-        for (int mps = minMPS; mps <= maxMPS && numMPS < MAX_PARTICOES; mps += passo)
-        {
-            particoes[numMPS] = mps;
-
-            // Copia o vetor original
-            int *Vtemp = new int[tam];
-            for (int i = 0; i < tam; i++)
-            {
-                Vtemp[i] = V[i];
-            }
-
-            // Executa a ordenação
-            DadosAlg d;
-            OrdenadorUniversal ou;
-            ou.ordenadorUniversal(Vtemp, tam, mps, tam, &d);
-
-           
+    while ((diffCusto > limiarCusto) && (numMPS >= 5)) {
+        numMPS = 0;
+        std::cout << "iter " << iter << std::endl ;
+        for (int t = minMPS; t <= maxMPS && numMPS < MAX_CUSTOS; t += passoMPS) {
+            U.ordenadorUniversal(V, tam, t, 0, &d);
             
-            std::cout << "mps " << mps << d.custo(a,b,c) << " cmp "<<d.cmp << " move "<< d.mov << std::endl;
-            //mps 2 cost 118.433083300 cmp 11772 move 7904 calls 1489
-
-            delete[] Vtemp;
+            // Armazena
+            custo[numMPS] = d.setCusto(a,b,c);
+            std::cout << "mps " << t << " cost "<< custo[numMPS] << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
             numMPS++;
         }
-
-        // Verifica condições de parada
-        double menor = custos[0];
-        double maior = custos[0];
-        int melhorIndice = 0;
-
-        for (int i = 1; i < numMPS; i++)
-        {
-            if (custos[i] < menor)
-            {
-                menor = custos[i];
-                melhorIndice = i;
-            }
-            if (custos[i] > maior)
-            {
-                maior = custos[i];
-            }
+        
+        limParticao = menorCusto(custo, numMPS);
+        calculaNovaFaixa(limParticao, numMPS, minMPS, maxMPS, passoMPS);
+        
+        // Calcula diferença entre custos extremos
+        double custoMin = custo[0];
+        double custoMax = custo[0];
+        for (int i = 1; i < numMPS; i++) {
+            if (custo[i] < custoMin) custoMin = custo[i];
+            if (custo[i] > custoMax) custoMax = custo[i];
         }
-
-        limParticao = particoes[melhorIndice];
-        double diffCusto = maior - menor;
-
-        printf("nummps %d limParticao %d mpsdiff %.6f\n", numMPS, limParticao, diffCusto);
-        //nummps 6 limParticao 2 mpsdiff 307.698059
-        if (diffCusto < limiarCusto || numMPS < 5)
-        {
-            break;
-        }
-
-        // Atualiza faixa para próxima iteração
-        int novoMin = particoes[std::max(0, melhorIndice - 1)];
-        int novoMax = particoes[std::min(numMPS - 1, melhorIndice + 1)];
-        minMPS = novoMin;
-        maxMPS = novoMax;
-
+        diffCusto = (custoMax - custoMin) > 0 ? custoMax - custoMin : custoMin - custoMax;
         iter++;
     }
-
-    return limParticao;
+    
+    // Retorna o tamanho ótimo de partição
+    return minMPS + limParticao * passoMPS;
+    
 }
+
+
+
 
 int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c)
 {
@@ -339,7 +153,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
             OrdenadorUniversal ou;
             ou.ordenadorUniversal(Vtemp, tam, tam, q, &d); // minTamParticao = tam, força Quicksort
 
-            custos[numLimiar] = d.custo(a, b, c);
+            custos[numLimiar] = d.setCusto(a, b, c);
 
             delete[] Vtemp;
             numLimiar++;
@@ -401,7 +215,7 @@ void OrdenadorUniversal::ordenadorUniversal(int V[], int tam, int minTamParticao
     {
         if (tam > minTamParticao)
         {
-            quickSort3(V, 0, tam - 1, d);
+            quickSort3(V, 0, tam - 1, minTamParticao, d);
         }
         else
         {
