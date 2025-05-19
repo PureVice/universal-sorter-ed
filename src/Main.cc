@@ -58,12 +58,17 @@ int main(int argc, char *argv[]) {
     cout << "Coeficientes: a=" << a << " b=" << b << " c=" << c << endl;
     cout << "Tamanho do vetor: " << tam << endl;
     cout << endl;
+    OrdenadorUniversal o = OrdenadorUniversal();
+    int quebras = o.calcularQuebras(vetor, count);
     DadosAlg d = DadosAlg();
+    
     //insertionSort(vetor, 0, count - 1, &d);
     quickSort3(vetor, 0, count - 1, &d);
     d.print();
     d.custo(a, b, c);
-    cout << "Custo: " << d.custo(a, b, c) << endl;
+    
+    cout << "Quebras: " << quebras << endl;
+    cout << "Custo: " << d.custo(a, b, c) << endl; //deveria ser o custo do TAD
 
     // Libera a memória alocada
     delete[] vetor;

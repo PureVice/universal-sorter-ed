@@ -29,9 +29,9 @@ void quickSort3(int* A, int l, int r, DadosAlg *d);
 class OrdenadorUniversal {
 public:
     void ordenadorUniversal(int V[], int tam, int minTamParticao, int limiarQuebras, DadosAlg& d);
-    
-private:
     int calcularQuebras(int V[], int tam);
+private:
+    
 };
 
 #endif
