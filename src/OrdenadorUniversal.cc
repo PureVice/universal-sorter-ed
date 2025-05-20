@@ -86,10 +86,17 @@ int determinaLimiarParticao(int* V, int tam, double limiarCusto, double a, doubl
 
 
     while ((diffCusto > limiarCusto) && (numMPS >= 5)) {
+        
         numMPS = 0;
         std::cout << "iter " << iter << std::endl ;
         for (int t = minMPS; t <= maxMPS && numMPS < MAX_CUSTOS; t += passoMPS) {
-            U.ordenadorUniversal(V, tam, t, 0, &d);
+            int V_copia[tam]; 
+            for (int i = 0; i < tam; i++)
+            {
+                V_copia[i] = V[i]; //copia o vetor original para os testes mps
+            }
+            d.reset();
+            U.ordenadorUniversal(V_copia, tam, t, 0, &d);
             
             // Armazena
             custo[numMPS] = d.setCusto(a,b,c);
@@ -208,8 +215,9 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
 // Implementação do método da classe OrdenadorUniversal
 void OrdenadorUniversal::ordenadorUniversal(int V[], int tam, int minTamParticao, int limiarQuebras, DadosAlg *d)
 {
+    //std::cout << "tamanho: " << tam << std::endl;
     int quebras = calcularQuebras(V, tam);
-
+    //std::cout << "quebras: " << quebras << std::endl;
     if (quebras < limiarQuebras)
     {
         insertionSort(V, 0, tam - 1, d);
@@ -225,4 +233,6 @@ void OrdenadorUniversal::ordenadorUniversal(int V[], int tam, int minTamParticao
             insertionSort(V, 0, tam - 1, d);
         }
     }
+    
+    
 }
