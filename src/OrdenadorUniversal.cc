@@ -166,7 +166,8 @@ int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, doubl
             if (custo[i] > custoMax)
                 custoMax = custo[i];
         }
-        diffCusto = (custoMax - custoMin) > 0 ? custoMax - custoMin : custoMin - custoMax;
+        diffCusto = mpses[maxMPS] - mpses[menorCustoAlt(mpses, tam)];
+        if (diffCusto < 0) diffCusto = -diffCusto;  // Garante valor positivo
         iter++;
         std::cout << "nummps " << numMPS << " limParticao " << menorCustoAlt(mpses, tam) << " mpsdiff " << diffCusto << std::endl;
     }
