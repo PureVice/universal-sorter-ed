@@ -118,12 +118,12 @@ void partition3(int *A, int l, int r, int *i, int *j, DadosAlg *d)
 
 void quickSort3(int *A, int l, int r, int minTamParticao, DadosAlg *d)
 {
-    d->inccalls(1);
+    
         if (r - l + 1 <= minTamParticao) {
         insertionSort(A, l, r, d);
         return;
     }
-
+    d->inccalls(1);
     if (l < r)
     {
         int i, j;

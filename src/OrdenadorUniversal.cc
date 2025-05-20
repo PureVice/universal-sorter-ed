@@ -48,7 +48,10 @@ void calculaNovaFaixa(int limParticao, int numMPS, int& minMPS, int& maxMPS, int
     
     // Converte índices para tamanhos reais de partição
     minMPS = getMPS(newMin, minMPS, passoMPS);
+    
     maxMPS = getMPS(newMax, minMPS, passoMPS);
+    std::cout << "minMPS "<<minMPS<<std::endl;
+    std::cout << "maxMPS "<<maxMPS<<std::endl;
     
     // Garante que minMPS não seja menor que 2
     if (minMPS < 2) minMPS = 2;
@@ -109,7 +112,7 @@ int determinaLimiarParticao(int* V, int tam, double limiarCusto, double a, doubl
     }
     
     // Retorna o tamanho ótimo de partição
-    return minMPS + limParticao * passoMPS;
+    return minMPS + limParticao * passoMPS;/*  */
     
 }
 
