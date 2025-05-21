@@ -47,3 +47,7 @@ clean:
 
 run: 
 	./bin/$(TARGET) arquivo.txt
+run3: 
+	./bin/$(TARGET) arquivo3.txt
+
+

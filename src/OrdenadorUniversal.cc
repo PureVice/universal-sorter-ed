@@ -2,6 +2,7 @@
 #include "../include/Ordenacao.h"
 #include "../include/Util.h"
 #include <iostream>
+#include <iomanip>
 
 int menorCustoAlt(double custos[], int tamanho)
 {
@@ -16,7 +17,7 @@ int menorCustoAlt(double custos[], int tamanho)
             idxMin = i;
         }
     }
-
+ 
     return idxMin;
 }
 int maiorCustoAlt(double custos[], int tamanho)
@@ -37,7 +38,7 @@ int maiorCustoAlt(double custos[], int tamanho)
         }
     }
 
-    std::cout << "idxMax: " << idxMax << std::endl;
+    
     return idxMax;
 }
 
@@ -63,71 +64,83 @@ int getMPS(int index, int minMPS, int passoMPS)
 {
     return minMPS + (index * passoMPS);
 }
-
+int newMin, newMax;
 // Calcula nova faixa de busca em torno da melhor partição encontrada
-void calculaNovaFaixa(int limParticao, int numMPS, int &minMPS, int &maxMPS, int &passoMPS)
+void calculaNovaFaixa(int limParticao, int numMPS, int &minMPS, int &maxMPS, int &passoMPS) 
 {
-    int newMin, newMax;
+    
 
-    if (limParticao == 0)
-    {
+    
+
+    if (limParticao == 0) {
+        
         newMin = 0;
         newMax = 2;
-    }
-    else if (limParticao == numMPS - 1)
-    {
+    } 
+    else if (limParticao == numMPS - 1) {
+        
         newMin = numMPS - 3;
         newMax = numMPS - 1;
-    }
-    else
-    {
+    } 
+    else {
+        
         newMin = limParticao - 1;
         newMax = limParticao + 1;
     }
 
-    // Converte índices para tamanhos reais de partição
+    
+
+    // Store original values before modification
+    int originalMin = minMPS;
+    int originalPasso = passoMPS;
+    
     minMPS = getMPS(newMin, minMPS, passoMPS);
+    maxMPS = getMPS(newMax, originalMin, originalPasso);  // Use original values
+    
+    
 
-    maxMPS = getMPS(newMax, minMPS, passoMPS);
-    std::cout << "minMPS " << minMPS << std::endl;
-    std::cout << "maxMPS " << maxMPS << std::endl;
-
-    // Garante que minMPS não seja menor que 2
-    if (minMPS < 2)
-        minMPS = 2;
-
+    // Calculate new passoMPS
+    int oldPasso = passoMPS;
     passoMPS = (maxMPS - minMPS) / 5;
-    if (passoMPS == 0)
+    if (passoMPS == 0) {
         passoMPS = 1;
+        
+    }
+    
+
 }
 
 struct estatisticas
 {
 };
 
-        double menorDiferenca(double custos[], int tam)
+double menorDiferenca(double custos[], int tam)
+{
+    double menor = __DBL_MAX__;
+    for (int i = 0; i < tam; i++)
+    {
+        for (int j = i + 1; j < tam; j++)
         {
-            double menor = __DBL_MAX__;
-            for (int i = 0; i < tam; i++)
+            double dif = custos[i] - custos[j];
+            if (dif != 0)
             {
-                for (int j = i + 1; j < tam; j++)
+                if (dif < 0)
                 {
-                    double dif = custos[i] - custos[j];
-                    if (dif<0){
-                        dif = -dif;
-                    }
-                    if (dif < menor)
-                    {
-                        menor = dif;
-                    }
+                    dif = -dif;
+                }
+                if (dif < menor)
+                {
+                    menor = dif;
                 }
             }
-            return menor;
         }
+    }
+    return menor;
+}
 // Função principal para determinar o melhor minTamParticao
 int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, double b, double c)
 {
-    std::cout << "entrou no determinaLimiar" << std::endl;
+    std::cout << std::fixed << std::setprecision(9);
     int minMPS = 2;
     int maxMPS = tam;
     int numMPS = 5;
@@ -153,6 +166,8 @@ int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, doubl
 
         numMPS = 0;
         std::cout << "iter " << iter << std::endl;
+        std::fill(custo, custo + MAX_CUSTOS, 0.0);
+
         for (int t = minMPS; t <= maxMPS && numMPS < MAX_CUSTOS; t += passoMPS)
         {
             int V_copia[tam];
@@ -177,19 +192,21 @@ int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, doubl
         calculaNovaFaixa(limParticao, numMPS, minMPS, maxMPS, passoMPS);
 
         // Calcula diferença entre custos extremos
-        double custoMin = custo[0];
-        double custoMax = custo[0];
-        for (int i = 1; i < numMPS; i++)
-        {
-            if (custo[i] < custoMin)
-                custoMin = custo[i];
-            if (custo[i] > custoMax)
-                custoMax = custo[i];
-        }
+  
 
+        //diffCusto = menorDiferenca(custo, numMPS);
+        diffCusto = std::abs(custo[newMax] - custo[newMin]);
 
-        diffCusto = menorCusto(custo, tam);
+// Corrige flutuações numéricas muito pequenas
+const double EPSILON = 1e-9;
+if (diffCusto < EPSILON) {
+    diffCusto = 0.0;
+}
+
+        
+        
         iter++;
+        std::cout << std::setprecision(6);
         std::cout << "nummps " << numMPS << " limParticao " << menorCustoAlt(mpses, tam) << " mpsdiff " << diffCusto << std::endl;
     }
 
