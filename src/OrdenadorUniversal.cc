@@ -179,91 +179,89 @@ int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, doubl
     // Retorna o tamanho ótimo de partição
     return minMPS + limParticao * passoMPS; /*  */
 }
+/* 
+são 6 faixas, igual lim particao
+lq = t do lim particao
+calculamos a faixa do mesmo jeito 
+vamos tentar imprimir, depois fazer o resto
 
+
+
+*/
 int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c)
 {
-    int minQ = 0;
-    int maxQ = tam - 1;
+    std::cout << std::fixed;
+    int minQ = 1;
+    int maxQ = calcularQuebras(V, tam);
+    int numQ = 5;
     int passoQ = (maxQ - minQ) / 5;
+    int iter = 0;
 
-    if (passoQ == 0)
+    double custo[MAX_CUSTOS];
+    int limQuebras = 0;
+    DadosAlg d;
+    OrdenadorUniversal U;
+    double quebs[tam];
+    for (int i = 0; i < tam; i++)
     {
-        passoQ = 1;
+        quebs[i] = 0;
     }
 
-    double diffCusto = 1000000000.0; // Valor inicial grande
-    int limQuebras = minQ;
+    double diffCusto = limiarCusto + 1; // Garante entrada no loop
 
-    const int MAX_LIMIARES = 100;
-    int limiares[MAX_LIMIARES];
-    double custos[MAX_LIMIARES];
-
-    while (diffCusto > limiarCusto)
+    while ((diffCusto > limiarCusto) && (numQ >= 5))
     {
-        int numLimiar = 0;
 
-        for (int q = minQ; q <= maxQ && numLimiar < MAX_LIMIARES; q += passoQ)
+        numQ = 0;
+        std::cout << "iter " << iter << std::endl;
+        std::fill(custo, custo + MAX_CUSTOS, 0.0);
+
+        for (int t = minQ; t <= maxQ && numQ < MAX_CUSTOS; t += passoQ)
         {
-            limiares[numLimiar] = q;
+            int V_copia[tam];
 
-            // Cópia manual do vetor original
-            int *Vtemp = new int[tam];
             for (int i = 0; i < tam; i++)
             {
-                Vtemp[i] = V[i];
+                V_copia[i] = V[i]; // copia o vetor original para os testes 
             }
+            d.reset();
 
-            DadosAlg d;
-            OrdenadorUniversal ou;
-            ou.ordenadorUniversal(Vtemp, tam, tam, q, &d); // minTamParticao = tam, força Quicksort
+            //daqui fica diferente, temos que fazer o tal shufflevector usando a copia, o tmanho e o numero de quebras (t) como parametro
+            U.ordenadorUniversal(V_copia, tam, t, 0, &d);
 
-            custos[numLimiar] = d.setCusto(a, b, c);
-
-            delete[] Vtemp;
-            numLimiar++;
+            // Armazena
+            custo[numQ] = d.setCusto(a, b, c);
+            quebs[t] = custo[numQ];
+            std::cout << "lq " << t << " cost " << std::setprecision(9) << custo[numQ] << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
+            numQ++;
         }
 
-        if (numLimiar < 5)
+        menorCustoAlt(quebs, tam);
+        maiorCustoAlt(quebs, tam);
+        limQuebras = menorCusto(custo, numQ);
+        calculaNovaFaixa(limQuebras, numQ, minQ, maxQ, passoQ);
+
+        // Calcula diferença entre custos extremos
+
+        
+        diffCusto = std::abs(custo[newMax] - custo[newMin]);
+
+        // Corrige flutuações numéricas muito pequenas
+        const double EPSILON = 1e-9;
+        if (diffCusto < EPSILON)
         {
-            break;
+            diffCusto = 0.0;
         }
 
-        limQuebras = menorCusto(custos, numLimiar);
-        diffCusto = custos[0] - custos[numLimiar - 1];
-        if (diffCusto < 0)
-        {
-            diffCusto = -diffCusto;
-        }
-
-        int newMinIdx = 0;
-        int newMaxIdx = 0;
-
-        if (limQuebras == 0)
-        {
-            newMinIdx = 0;
-            newMaxIdx = (numLimiar >= 3) ? 2 : numLimiar - 1;
-        }
-        else if (limQuebras == numLimiar - 1)
-        {
-            newMinIdx = (numLimiar >= 3) ? numLimiar - 3 : 0;
-            newMaxIdx = numLimiar - 1;
-        }
-        else
-        {
-            newMinIdx = limQuebras - 1;
-            newMaxIdx = limQuebras + 1;
-        }
-
-        minQ = limiares[newMinIdx];
-        maxQ = limiares[newMaxIdx];
-        passoQ = (maxQ - minQ) / 5;
-        if (passoQ == 0)
-        {
-            passoQ = 1;
-        }
+        iter++;
+        
+        std::cout << std::setprecision(6);
+        
+        std::cout << "numlq " << numQ << " limQuebras " << menorCustoAlt(quebs, tam) << " mpsdiff " << diffCusto << std::endl;
     }
 
-    return limiares[limQuebras];
+    // Retorna o tamanho ótimo de partição
+    return minQ + limQuebras * passoQ; /*  */
 }
 
 
