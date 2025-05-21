@@ -3,7 +3,34 @@
 #include "../include/Util.h"
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
 #define MAX_CUSTOS 100
+// Função auxiliar para embaralhar o vetor introduzindo quebras
+void shuffleVector(int *vet, int size, int numShuffle)
+{
+
+    int p1 = 0, p2 = 0, temp;
+
+    for (int t = 0; t < numShuffle; t++)
+    {
+
+        // Garante que p1 e p2 sejam diferentes
+        while (p1 == p2)
+        {
+            p1 = (int)(drand48() * size);
+            p2 = (int)(drand48() * size);
+        }
+
+        // Troca os valores
+        temp = vet[p1];
+        vet[p1] = vet[p2];
+        vet[p2] = temp;
+
+        // Reseta os índices
+        p1 = p2 = 0;
+    }
+}
+
 int menorCustoAlt(double custos[], int tamanho)
 {
     int idxMin = 0;
@@ -95,7 +122,7 @@ void calculaNovaFaixa(int limParticao, int numMPS, int &minMPS, int &maxMPS, int
     maxMPS = getMPS(newMax, originalMin, originalPasso); // Use original values
 
     // Calculate new passoMPS
-    //int oldPasso = passoMPS;
+    // int oldPasso = passoMPS;
     passoMPS = (maxMPS - minMPS) / 5;
     if (passoMPS == 0)
     {
@@ -159,7 +186,6 @@ int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, doubl
 
         // Calcula diferença entre custos extremos
 
-        
         diffCusto = std::abs(custo[newMax] - custo[newMin]);
 
         // Corrige flutuações numéricas muito pequenas
@@ -170,34 +196,34 @@ int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, doubl
         }
 
         iter++;
-        
+
         std::cout << std::setprecision(6);
-        
+
         std::cout << "nummps " << numMPS << " limParticao " << menorCustoAlt(mpses, tam) << " mpsdiff " << diffCusto << std::endl;
     }
 
     // Retorna o tamanho ótimo de partição
     return minMPS + limParticao * passoMPS; /*  */
 }
-/* 
+/*
 são 6 faixas, igual lim particao
 lq = t do lim particao
-calculamos a faixa do mesmo jeito 
+calculamos a faixa do mesmo jeito
 vamos tentar imprimir, depois fazer o resto
 
 
 
 */
-int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c)
+int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c, int seed)
 {
     std::cout << std::fixed;
     int minQ = 1;
-    int maxQ = calcularQuebras(V, tam);
+    int maxQ = tam / 2;
     int numQ = 5;
     int passoQ = (maxQ - minQ) / 5;
     int iter = 0;
 
-    double custo[MAX_CUSTOS];
+    double custos[2][MAX_CUSTOS]; // [0] -> quick, [1] -> insertion
     int limQuebras = 0;
     DadosAlg d;
     OrdenadorUniversal U;
@@ -207,64 +233,88 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
         quebs[i] = 0;
     }
 
-    double diffCusto = limiarCusto + 1; // Garante entrada no loop
+    double diffCusto = limiarCusto + 1;
 
     while ((diffCusto > limiarCusto) && (numQ >= 5))
     {
-
         numQ = 0;
-        std::cout << "iter " << iter << std::endl;
-        std::fill(custo, custo + MAX_CUSTOS, 0.0);
+
+        for (int i = 0; i < MAX_CUSTOS; i++)
+        {
+            custos[0][i] = custos[1][i] = 0.0;
+        }
 
         for (int t = minQ; t <= maxQ && numQ < MAX_CUSTOS; t += passoQ)
         {
+
+            d.reset();
             int V_copia[tam];
+            int V_copia2[tam];
+            int V_ordenado[tam];
+            int V_ordenado2[tam];
 
             for (int i = 0; i < tam; i++)
             {
-                V_copia[i] = V[i]; // copia o vetor original para os testes 
+                V_copia[i] = V[i];
+                V_copia2[i] = V[i];
+                V_ordenado[i] = V[i];
+                V_ordenado2[i] = V[i];
             }
+            DadosAlg temp = DadosAlg();
+            U.fakeOrdenadorUniversal(V_ordenado, tam, t, 0, &temp, 0);
+
+            srand48(seed);
+            shuffleVector(V_ordenado, tam, t);
+            U.fakeOrdenadorUniversal(V_copia, tam, t, 0, &d, 0);
+
+            custos[0][numQ] = d.setCusto(a, b, c);
+            quebs[t] = custos[0][numQ];
+            
+            std::cout << "qs lq " << t << " cost " << std::setprecision(9) << d.setCusto(a, b, c)
+                      << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
+
+            U.fakeOrdenadorUniversal(V_ordenado2, tam, t, 0, &temp, 0);
+
             d.reset();
+            srand48(seed);
+            shuffleVector(V_ordenado2, tam, t);
+            U.fakeOrdenadorUniversal(V_ordenado2, tam, t, 0, &d, 1);
 
-            //daqui fica diferente, temos que fazer o tal shufflevector usando a copia, o tmanho e o numero de quebras (t) como parametro
-            U.ordenadorUniversal(V_copia, tam, t, 0, &d);
+            custos[1][numQ] = d.setCusto(a, b, c);
+            std::cout << "in lq " << t << " cost " << std::setprecision(9) << custos[1][numQ]
+                      << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
 
-            // Armazena
-            custo[numQ] = d.setCusto(a, b, c);
-            quebs[t] = custo[numQ];
-            std::cout << "lq " << t << " cost " << std::setprecision(9) << custo[numQ] << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
+            std::cout << "custos[0][" << numQ << "] (quick): " << custos[0][numQ] << std::endl;
+            std::cout << "custos[1][" << numQ << "] (insertion): " << custos[1][numQ] << std::endl;
+
             numQ++;
         }
 
         menorCustoAlt(quebs, tam);
         maiorCustoAlt(quebs, tam);
-        limQuebras = menorCusto(custo, numQ);
+
+        limQuebras = menorCusto(custos[1], numQ);
+
         calculaNovaFaixa(limQuebras, numQ, minQ, maxQ, passoQ);
 
-        // Calcula diferença entre custos extremos
+        diffCusto = std::abs(custos[1][newMax] - custos[1][newMin]);
 
-        
-        diffCusto = std::abs(custo[newMax] - custo[newMin]);
-
-        // Corrige flutuações numéricas muito pequenas
         const double EPSILON = 1e-9;
         if (diffCusto < EPSILON)
         {
             diffCusto = 0.0;
         }
 
-        iter++;
-        
         std::cout << std::setprecision(6);
-        
-        std::cout << "numlq " << numQ << " limQuebras " << menorCustoAlt(quebs, tam) << " mpsdiff " << diffCusto << std::endl;
+        std::cout << "numlq " << numQ << " limQuebras " << menorCustoAlt(quebs, tam)
+                  << " lqdiff " << diffCusto << std::endl;
+
+        iter++;
     }
 
-    // Retorna o tamanho ótimo de partição
-    return minQ + limQuebras * passoQ; /*  */
+    int resultado = minQ + limQuebras * passoQ;
+    return resultado;
 }
-
-
 
 // Implementação do método da classe OrdenadorUniversal
 void OrdenadorUniversal::ordenadorUniversal(int V[], int tam, int minTamParticao, int limiarQuebras, DadosAlg *d)
@@ -286,5 +336,18 @@ void OrdenadorUniversal::ordenadorUniversal(int V[], int tam, int minTamParticao
         {
             insertionSort(V, 0, tam - 1, d);
         }
+    }
+}
+
+void OrdenadorUniversal::fakeOrdenadorUniversal(int V[], int tam, int minTamParticao, int limiarQuebras, DadosAlg *d, int alg)
+{
+
+    if (alg != 0)
+    {
+        insertionSort(V, 0, tam - 1, d);
+    }
+    if (alg == 0)
+    {
+        quickSort3(V, 0, tam - 1, minTamParticao, d);
     }
 }

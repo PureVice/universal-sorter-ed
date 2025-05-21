@@ -9,8 +9,8 @@ void registraEstatisticas(double custo);
 void imprimeEstatisticas(double custo);
 // Declaração das funções de ordenação
 
-int determinaLimiarParticao(int V[], int tam, double limiarCusto, double a, double b, double c);
-int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c);
+//int determinaLimiarParticao(int V[], int tam, double limiarCusto, double a, double b, double c);
+int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c, int seed);
 void calculaNovaFaixa(int limParticao, int &minMPS, int &maxMPS, int &passoMPS);
 int menorCusto(double custos[], int tamanho);
 int calcularQuebras(int V[], int tam);
@@ -20,7 +20,7 @@ int calcularQuebras(int V[], int tam);
 class OrdenadorUniversal {
 public:
     void ordenadorUniversal(int V[], int tam, int minTamParticao, int limiarQuebras, DadosAlg* d);
-    
+    void fakeOrdenadorUniversal(int V[], int tam, int minTamParticao, int limiarQuebras, DadosAlg* d, int alg);
 private:
     
 };
