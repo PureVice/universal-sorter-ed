@@ -44,15 +44,8 @@ int main(int argc, char *argv[]) {
 
     // Definir os limiares com base nos testes de custo
     int minTamParticao = determinaLimiarParticao(vetor, tam, limiarCusto, a, b, c);
+    int limiarQuebras = determinaLimiarQuebras(vetor, tam, limiarCusto, a, b, c);
 
-    //int limiarQuebras = determinaLimiarQuebras(vetor, tam, limiarCusto, a, b, c);
-    
-    // Executar Ordenador Universal com os limiares encontrados
-    //DadosAlg d;
-    //OrdenadorUniversal ou;
-    //ou.ordenadorUniversal(vetor, tam, minTamParticao, tam, &d);
-
-    // Saída dos dados
     cout << ">>> Parâmetros lidos do arquivo:" << endl;
     cout << "Seed: " << seed << endl;
     cout << "Limiar de Custo: " << limiarCusto << endl;
@@ -62,7 +55,7 @@ int main(int argc, char *argv[]) {
     cout << ">>> Resultados:" << endl;
     cout << "Limiar ótimo de Partição: " << minTamParticao << endl;
     
-    //cout << "Limiar ótimo de Quebras: " << limiarQuebras << endl;
+    cout << "Limiar ótimo de Quebras: " << limiarQuebras << endl;
     cout << "Número de quebras no vetor original: " << calcularQuebras(vetor, tam) << endl;
 
     //d.print();
