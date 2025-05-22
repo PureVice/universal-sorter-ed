@@ -37,36 +37,16 @@ int main(int argc, char *argv[]) {
         count++;
     }
     arquivo.close();
-
-    if (count != tam) {
-        cerr << "Aviso: Foram lidos " << count << " números, mas eram esperados " << tam << endl;
-    }
+        cout << "size " << tam
+         << " seed " << seed 
+         << " breaks " << calcularQuebras(vetor, tam)
+         << endl << endl;
 
     // Definir os limiares com base nos testes de custo
     int minTamParticao = determinaLimiarParticao(vetor, tam, limiarCusto, a, b, c);
-    cout << endl;
-        cout << endl;
-            cout << endl;
-    int limiarQuebras = determinaLimiarQuebras(vetor, tam, limiarCusto, a, b, c, seed, minTamParticao+1);
+    determinaLimiarQuebras(vetor, tam, limiarCusto, a, b, c, seed, minTamParticao+1);
 
-    cout << ">>> Parâmetros lidos do arquivo:" << endl;
-    cout << "Seed: " << seed << endl;
-    cout << "Limiar de Custo: " << limiarCusto << endl;
-    cout << "Coeficientes: a=" << a << ", b=" << b << ", c=" << c << endl;
-    cout << "Tamanho do vetor: " << tam << endl << endl;
 
-    cout << ">>> Resultados:" << endl;
-    //cout << "Limiar ótimo de Partição: " << minTamParticao << endl;
-    
-    cout << "Limiar ótimo de Quebras: " << limiarQuebras << endl;
-    cout << "Número de quebras no vetor original: " << calcularQuebras(vetor, tam) << endl;
-
-    //d.print();
-    //cout << "Custo total: " << d.setCusto(a, b, c) << endl;
-
-    for(int i = 0; i < 50; i++){
-        cout << "# " << vetor[i];
-    }
 
     delete[] vetor;
     return 0;
