@@ -92,42 +92,66 @@ int getMPS(int index, int minMPS, int passoMPS)
 }
 int newMin, newMax;
 // Calcula nova faixa de busca em torno da melhor partição encontrada
-void calculaNovaFaixa(int limParticao, int numMPS, int &minMPS, int &maxMPS, int &passoMPS)
+void calculaNovaFaixa(int limParticao, int numMPS, int &minMPS, int &maxMPS, int &passoMPS) 
 {
+    std::cout << "\n=== calculaNovaFaixa (INÍCIO) ===" << std::endl;
+    std::cout << "Parâmetros de entrada:" << std::endl;
+    std::cout << "limParticao: " << limParticao 
+              << " | numMPS: " << numMPS 
+              << " | minMPS: " << minMPS 
+              << " | maxMPS: " << maxMPS 
+              << " | passoMPS: " << passoMPS << std::endl;
 
-    if (limParticao == 0)
+    // Cálculo de newMin e newMax
+    if (limParticao == 0) 
     {
-
         newMin = 0;
         newMax = 2;
-    }
-    else if (limParticao == numMPS - 1)
+        std::cout << "[Caso 1] limParticao é o primeiro elemento. newMin: 0, newMax: 2" << std::endl;
+    } 
+    else if (limParticao == numMPS - 1) 
     {
-
         newMin = numMPS - 3;
         newMax = numMPS - 1;
-    }
-    else
+        std::cout << "[Caso 2] limParticao é o último elemento. newMin: " << newMin 
+                  << ", newMax: " << newMax << std::endl;
+    } 
+    else 
     {
-
         newMin = limParticao - 1;
         newMax = limParticao + 1;
+        std::cout << "[Caso 3] limParticao no meio. newMin: " << newMin 
+                  << ", newMax: " << newMax << std::endl;
     }
 
-    // Store original values before modification
+    // Valores originais
     int originalMin = minMPS;
     int originalPasso = passoMPS;
+    std::cout << "\nValores originais:" << std::endl;
+    std::cout << "originalMin: " << originalMin 
+              << " | originalPasso: " << originalPasso << std::endl;
 
+    // Atualização de minMPS e maxMPS
     minMPS = getMPS(newMin, minMPS, passoMPS);
-    maxMPS = getMPS(newMax, originalMin, originalPasso); // Use original values
+    maxMPS = getMPS(newMax, originalMin, originalPasso);
+    std::cout << "\nNovos valores calculados:" << std::endl;
+    std::cout << "minMPS: " << minMPS << " (fórmula: " << originalMin << " + " << newMin << "*" << passoMPS << ")" << std::endl;
+    std::cout << "maxMPS: " << maxMPS << " (fórmula: " << originalMin << " + " << newMax << "*" << originalPasso << ")" << std::endl;
 
-    // Calculate new passoMPS
-    // int oldPasso = passoMPS;
+    // Ajuste do passo
+    int oldPasso = passoMPS;
     passoMPS = (maxMPS - minMPS) / 5;
-    if (passoMPS == 0)
+    if (passoMPS == 0) 
     {
         passoMPS = 1;
+        std::cout << "\n[AVISO] passoMPS zerado! Ajustado para 1" << std::endl;
     }
+    std::cout << "\nPasso atualizado:" << std::endl;
+    std::cout << "oldPasso: " << oldPasso 
+              << " | newPasso: " << passoMPS 
+              << " (fórmula: (" << maxMPS << " - " << minMPS << ") / 5)" << std::endl;
+
+    std::cout << "=== calculaNovaFaixa (FIM) ===\n" << std::endl;
 }
 
 // Função principal para determinar o melhor minTamParticao
@@ -150,7 +174,7 @@ int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, doubl
         mpses[i] = 0;
     }
 
-    double diffCusto = limiarCusto + 1; // Garante entrada no loop
+    float diffCusto = limiarCusto + 1; // Garante entrada no loop
 
     // Função local para encontrar índice do menor custo
 
@@ -199,7 +223,7 @@ int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, doubl
 
         std::cout << std::setprecision(6);
 
-        std::cout << "nummps " << numMPS << " limParticao " << menorCustoAlt(mpses, tam) << " mpsdiff " << diffCusto << std::endl;
+        std::cout << "nummps " << numMPS << " limParticao " << menorCustoAlt(mpses, tam) << " mpsdiff " << diffCusto << std::endl; //ababa
     }
 
     // Retorna o tamanho ótimo de partição
@@ -214,8 +238,7 @@ vamos tentar imprimir, depois fazer o resto
 
 
 */
-int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c, int seed)
-{
+int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c, int seed, int optimalMinTamParticao) {
     std::cout << std::fixed;
     int minQ = 1;
     int maxQ = tam / 2;
@@ -233,7 +256,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
         quebs[i] = 0;
     }
 
-    double diffCusto = limiarCusto + 1;
+    float diffCusto = limiarCusto + 1;
 
     while ((diffCusto > limiarCusto) && (numQ >= 5))
     {
@@ -263,10 +286,10 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
             d.reset();
             srand48(seed);
             shuffleVector(V_ordenado, tam, t);
-            U.fakeOrdenadorUniversal(V_ordenado, tam, t, 0, &d, 0);
+            U.fakeOrdenadorUniversal(V_ordenado, tam, optimalMinTamParticao, 0, &d, 0);
             
             custos[0][numQ] = d.setCusto(a, b, c);
-            quebs[t] = custos[0][numQ];
+            
 
             std::cout << "qs lq " << t << " cost " << std::setprecision(9) << custos[0][numQ]
                       << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
@@ -280,7 +303,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
             U.fakeOrdenadorUniversal(V_ordenado2, tam, t, 0, &d, 1);//provavalmente aqui 
 
             custos[1][numQ] = d.setCusto(a, b, c);
-            
+            quebs[t] = custos[0][numQ];
             std::cout << "in lq " << t << " cost " << std::setprecision(9) << custos[1][numQ]
                       << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
 
@@ -290,7 +313,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
         menorCustoAlt(quebs, tam);
         maiorCustoAlt(quebs, tam);
 
-        limQuebras = menorCusto(custos[1], numQ);
+        limQuebras = menorCustoAlt(quebs, numQ);
 
         calculaNovaFaixa(limQuebras, numQ, minQ, maxQ, passoQ);
 
@@ -303,7 +326,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
         }
 
         std::cout << std::setprecision(6);
-        std::cout << "numlq " << numQ << " limQuebras " << menorCustoAlt(quebs, tam)
+        std::cout << "numlq " << numQ << " limQuebras " << menorCustoAlt(quebs, tam)// ababa
                   << " lqdiff " << diffCusto << "\n"
                   << std::endl;
 

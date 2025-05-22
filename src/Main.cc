@@ -43,11 +43,11 @@ int main(int argc, char *argv[]) {
     }
 
     // Definir os limiares com base nos testes de custo
-    //int minTamParticao = determinaLimiarParticao(vetor, tam, limiarCusto, a, b, c);
+    int minTamParticao = determinaLimiarParticao(vetor, tam, limiarCusto, a, b, c);
     cout << endl;
         cout << endl;
             cout << endl;
-    int limiarQuebras = determinaLimiarQuebras(vetor, tam, limiarCusto, a, b, c, seed);
+    int limiarQuebras = determinaLimiarQuebras(vetor, tam, limiarCusto, a, b, c, seed, minTamParticao+1);
 
     cout << ">>> Parâmetros lidos do arquivo:" << endl;
     cout << "Seed: " << seed << endl;

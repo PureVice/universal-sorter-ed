@@ -9,8 +9,8 @@ void registraEstatisticas(double custo);
 void imprimeEstatisticas(double custo);
 // Declaração das funções de ordenação
 
-//int determinaLimiarParticao(int V[], int tam, double limiarCusto, double a, double b, double c);
-int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c, int seed);
+int determinaLimiarParticao(int V[], int tam, double limiarCusto, double a, double b, double c);
+int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c, int seed, int optimalMinTamParticao);
 void calculaNovaFaixa(int limParticao, int &minMPS, int &maxMPS, int &passoMPS);
 int menorCusto(double custos[], int tamanho);
 int calcularQuebras(int V[], int tam);
