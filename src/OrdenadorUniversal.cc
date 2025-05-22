@@ -237,6 +237,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
 
     while ((diffCusto > limiarCusto) && (numQ >= 5))
     {
+        std::cout << "iter " << iter << std::endl;
         numQ = 0;
 
         for (int i = 0; i < MAX_CUSTOS; i++)
@@ -247,45 +248,41 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
         for (int t = minQ; t <= maxQ && numQ < MAX_CUSTOS; t += passoQ)
         {
 
-            d.reset();
-            int V_copia[tam];
-            int V_copia2[tam];
             int V_ordenado[tam];
             int V_ordenado2[tam];
 
             for (int i = 0; i < tam; i++)
             {
-                V_copia[i] = V[i];
-                V_copia2[i] = V[i];
+
                 V_ordenado[i] = V[i];
                 V_ordenado2[i] = V[i];
             }
-            DadosAlg temp = DadosAlg();
-            U.fakeOrdenadorUniversal(V_ordenado, tam, t, 0, &temp, 0);
-
+            DadosAlg temp = DadosAlg(); // criado para ordenar o vetor antes do shuffle
+            U.fakeOrdenadorUniversal(V_ordenado, tam, t, 0, &temp, 0);//ignora
+            
+            d.reset();
             srand48(seed);
             shuffleVector(V_ordenado, tam, t);
-            U.fakeOrdenadorUniversal(V_copia, tam, t, 0, &d, 0);
-
+            U.fakeOrdenadorUniversal(V_ordenado, tam, t, 0, &d, 0);
+            
             custos[0][numQ] = d.setCusto(a, b, c);
             quebs[t] = custos[0][numQ];
-            
-            std::cout << "qs lq " << t << " cost " << std::setprecision(9) << d.setCusto(a, b, c)
+
+            std::cout << "qs lq " << t << " cost " << std::setprecision(9) << custos[0][numQ]
                       << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
 
-            U.fakeOrdenadorUniversal(V_ordenado2, tam, t, 0, &temp, 0);
+            temp.reset();
+            U.fakeOrdenadorUniversal(V_ordenado2, tam, t, 0, &temp, 0);//ignora
 
             d.reset();
             srand48(seed);
             shuffleVector(V_ordenado2, tam, t);
-            U.fakeOrdenadorUniversal(V_ordenado2, tam, t, 0, &d, 1);
+            U.fakeOrdenadorUniversal(V_ordenado2, tam, t, 0, &d, 1);//provavalmente aqui 
 
             custos[1][numQ] = d.setCusto(a, b, c);
+            
             std::cout << "in lq " << t << " cost " << std::setprecision(9) << custos[1][numQ]
                       << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
-
-            std::cout << "custos[0][" << numQ << "] (quick): " << custos[0][numQ] << std::endl;
-            std::cout << "custos[1][" << numQ << "] (insertion): " << custos[1][numQ] << std::endl;
 
             numQ++;
         }
@@ -307,7 +304,8 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
 
         std::cout << std::setprecision(6);
         std::cout << "numlq " << numQ << " limQuebras " << menorCustoAlt(quebs, tam)
-                  << " lqdiff " << diffCusto << std::endl;
+                  << " lqdiff " << diffCusto << "\n"
+                  << std::endl;
 
         iter++;
     }
