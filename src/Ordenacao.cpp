@@ -1,4 +1,4 @@
-#include "../include/Ordenacao.h"
+#include "../include/Ordenacao.hpp"
 #include <iostream>
 
 DadosAlg::DadosAlg() : cmp(0), mov(0), calls(0) {}

@@ -1,6 +1,6 @@
 #ifndef ORDENADOR_UNIVERSAL_H
 #define ORDENADOR_UNIVERSAL_H
-#include "Ordenacao.h"
+#include "Ordenacao.hpp"
 #include <iostream>
 
 

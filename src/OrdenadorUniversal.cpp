@@ -1,6 +1,6 @@
-#include "../include/OrdenadorUniversal.h"
-#include "../include/Ordenacao.h"
-#include "../include/Util.h"
+#include "../include/OrdenadorUniversal.hpp"
+#include "../include/Ordenacao.hpp"
+#include "../include/Util.hpp"
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
@@ -351,7 +351,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
             diffCusto = 0.0;
         }
 
-        std::cout << std::endl;
+        
         int idxMenor = idMenorCustoQuebras(numQ, custos);
     
         std::cout << std::setprecision(6);

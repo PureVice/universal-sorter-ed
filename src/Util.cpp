@@ -1,4 +1,4 @@
-#include "../include/Util.h"
+#include "../include/Util.hpp"
 #include <cstdlib>
 
 int calcularQuebras(int V[], int tam)

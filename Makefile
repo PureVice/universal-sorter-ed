@@ -19,8 +19,8 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-# cc and flags
-CC = g++
+# cpp and flags
+cpp = g++
 CXXFLAGS = -std=c++11 -g -Wall
 #CXXFLAGS = -std=c++11 -O3 -Wall
 
@@ -32,15 +32,15 @@ SRC_FOLDER = ./src/
 
 # all sources, objs, and header files
 MAIN = Main
-TARGET = run.out
-SRC = $(wildcard $(SRC_FOLDER)*.cc)
-OBJ = $(patsubst $(SRC_FOLDER)%.cc, $(OBJ_FOLDER)%.o, $(SRC))
+TARGET = tp1.out
+SRC = $(wildcard $(SRC_FOLDER)*.cpp)
+OBJ = $(patsubst $(SRC_FOLDER)%.cpp, $(OBJ_FOLDER)%.o, $(SRC))
 
-$(OBJ_FOLDER)%.o: $(SRC_FOLDER)%.cc
-	$(CC) $(CXXFLAGS) -c $< -o $@ -I$(INCLUDE_FOLDER)
+$(OBJ_FOLDER)%.o: $(SRC_FOLDER)%.cpp
+	$(cpp) $(CXXFLAGS) -c $< -o $@ -I$(INCLUDE_FOLDER)
 
 all: $(OBJ)
-	$(CC) $(CXXFLAGS) -o $(BIN_FOLDER)$(TARGET) $(OBJ)
+	$(cpp) $(CXXFLAGS) -o $(BIN_FOLDER)$(TARGET) $(OBJ)
 
 clean:
 	@rm -rf $(OBJ_FOLDER)* $(BIN_FOLDER)*
