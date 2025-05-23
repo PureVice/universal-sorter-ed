@@ -211,15 +211,57 @@ int determinaLimiarParticao(int *V, int tam, double limiarCusto, double a, doubl
     // Retorna o tamanho ótimo de partição
     return minMPS + limParticao * passoMPS; /*  */
 }
-/*
-são 6 faixas, igual lim particao
-lq = t do lim particao
-calculamos a faixa do mesmo jeito
-vamos tentar imprimir, depois fazer o resto
 
 
 
-*/
+
+int idMenorCustoQuebras(int numMPS, double custo[2][100] ){
+
+  int idMenorCusto;
+  double custoQs, custoIn, custoAbs, menorCusto;
+
+  for(int i = 0; i < numMPS; i++){
+    
+    custoQs = custo[0][i];
+    custoIn = custo[1][i];
+    custoAbs = std::abs(custoQs - custoIn);
+    if(i == 0 || menorCusto > custoAbs){
+      menorCusto = custoAbs; 
+      idMenorCusto = i;
+    }
+  }
+
+  return idMenorCusto;
+}
+class EstatisticasAlg
+{
+private:
+    int ql;
+    double cost, cmp, mov, calls;
+public:
+    EstatisticasAlg(/* args */);
+    EstatisticasAlg(int ql, double cost, double cmp, double mov, double calls);
+    ~EstatisticasAlg();
+};
+
+EstatisticasAlg::EstatisticasAlg()
+{
+    ql = 0;
+    cost = cmp = mov = calls = 0.0;
+}
+EstatisticasAlg::EstatisticasAlg(int ql, double cost, double cmp, double mov, double calls)
+{
+    this->ql = ql;
+    this->cost = cost;
+    this->cmp = cmp;
+    this->mov = mov;
+    this->calls = calls;
+}
+
+EstatisticasAlg::~EstatisticasAlg()
+{
+}
+
 int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, double b, double c, int seed, int optimalMinTamParticao) {
     std::cout << std::fixed;
     int minQ = 1;
@@ -229,6 +271,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
     int iter = 0;
 
     double custos[2][MAX_CUSTOS]; // [0] -> quick, [1] -> insertion
+    int lqs[MAX_CUSTOS];
     int limQuebras = 0;
     DadosAlg d;
     OrdenadorUniversal U;
@@ -241,7 +284,8 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
     float diffCusto = limiarCusto + 1;
 
     while ((diffCusto > limiarCusto) && (numQ >= 5))
-    {
+    {   
+        
         std::cout << "\niter " << iter << std::endl;
         numQ = 0;
 
@@ -272,7 +316,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
             
             custos[0][numQ] = d.setCusto(a, b, c);
             
-
+            lqs[numQ] = t;
             std::cout << "qs lq " << t << " cost " << std::setprecision(9) << custos[0][numQ]
                       << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
 
@@ -298,7 +342,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
         limQuebras = menorCustoAlt(quebs, numQ);
 
         calculaNovaFaixa(limQuebras, numQ, minQ, maxQ, passoQ);
-
+        
         diffCusto = std::abs(custos[1][newMax] - custos[1][newMin]);
 
         const double EPSILON = 1e-9;
@@ -307,8 +351,11 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
             diffCusto = 0.0;
         }
 
+        std::cout << std::endl;
+        int idxMenor = idMenorCustoQuebras(numQ, custos);
+    
         std::cout << std::setprecision(6);
-        std::cout << "numlq " << numQ << " limQuebras " << menorCustoAlt(quebs, tam)// ababa
+        std::cout << "numlq " << numQ << " limQuebras " << lqs[idxMenor]// ababa
                   << " lqdiff " << diffCusto << std::endl;
 
         iter++;
