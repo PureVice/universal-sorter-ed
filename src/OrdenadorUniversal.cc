@@ -228,11 +228,8 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
     int limQuebras = 0;
     DadosAlg d;
     OrdenadorUniversal U;
-    double quebs[tam];
-    for (int i = 0; i < tam; i++)
-    {
-        quebs[i] = 0;
-    }
+    
+
 
     float diffCusto = limiarCusto + 1; //garante entrada no primeiro looping
 
@@ -281,7 +278,7 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
             U.fakeOrdenadorUniversal(V_ordenado2, tam, t, 0, &d, 1);//provavalmente aqui 
 
             custos[1][numQ] = d.setCusto(a, b, c);
-            quebs[t] = custos[0][numQ];
+            
             std::cout << "in lq " << t << " cost " << std::setprecision(9) << custos[1][numQ]
                       << " cmp " << d.cmp << " move " << d.mov << " calls " << d.calls << std::endl;
 
@@ -295,7 +292,8 @@ int determinaLimiarQuebras(int V[], int tam, double limiarCusto, double a, doubl
         
         calculaNovaFaixa(limQuebras, numQ, minQ, maxQ, passoQ);
         diffCusto = std::abs(custos[1][newMax] - custos[1][newMin]);
-
+        std::cout << "newmax " << newMax << " newmin " << newMin;
+        std::cout << "\nmaxq " << maxQ << " minq " << minQ;
         const double EPSILON = 1e-9;
         if (diffCusto < EPSILON)
         {
