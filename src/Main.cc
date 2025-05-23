@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
         cout << "size " << tam
          << " seed " << seed 
          << " breaks " << calcularQuebras(vetor, tam)
-         << endl << endl;
+         << endl;
 
     // Definir os limiares com base nos testes de custo
     int minTamParticao = determinaLimiarParticao(vetor, tam, limiarCusto, a, b, c);
